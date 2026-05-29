@@ -14,6 +14,8 @@ def build_server() -> Server:
     t.register_parcels(app)
     t.register_pipes(app)
     t.register_roads(app)
+    t.register_points(app)
+    t.register_scripts(app)
     return app
 
 
