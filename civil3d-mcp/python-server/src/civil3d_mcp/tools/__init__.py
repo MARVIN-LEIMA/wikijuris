@@ -5,6 +5,7 @@ from .pipes import register as register_pipes
 from .roads import register as register_roads
 from .points import register as register_points
 from .scripts import register as register_scripts
+from .drawing import register as register_drawing
 
 __all__ = [
     "register_cad",
@@ -14,4 +15,5 @@ __all__ = [
     "register_roads",
     "register_points",
     "register_scripts",
+    "register_drawing",
 ]

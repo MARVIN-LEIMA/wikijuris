@@ -73,16 +73,35 @@ namespace Civil3DMCPPlugin.Tools
         /// </summary>
         public object CreateFigures(JObject p)
         {
-            var layer      = p["layer"]?.Value<string>() ?? "C-SURV-FTRE";
-            var siteName   = p["site"]?.Value<string>();
-            var filterCodes= p["codes"] is JArray ca
-                             ? ca.Select(t => t.Value<string>()!).ToHashSet(
-                                   StringComparer.OrdinalIgnoreCase)
-                             : null;
+            var defaultLayer = p["layer"]?.Value<string>() ?? "C-SURV-FTRE";
+            var siteName     = p["site"]?.Value<string>();
+            var filterCodes  = p["codes"] is JArray ca
+                               ? ca.Select(t => t.Value<string>()!).ToHashSet(
+                                     StringComparer.OrdinalIgnoreCase)
+                               : null;
+
+            // Optional per-code layer/color map from line code file
+            // {"EP": {"layer": "C-ROAD-EDGE", "color": 3}, ...}
+            var codeLayerMap = new Dictionary<string, string>(
+                StringComparer.OrdinalIgnoreCase);
+            var codeColorMap = new Dictionary<string, short>(
+                StringComparer.OrdinalIgnoreCase);
+            if (p["code_styles"] is JObject codeStyles)
+            {
+                foreach (var kv in codeStyles)
+                {
+                    if (kv.Value is JObject st)
+                    {
+                        if (st["layer"]?.Value<string>() is string lay)
+                            codeLayerMap[kv.Key] = lay;
+                        if (st["color"]?.Value<short?>() is short col)
+                            codeColorMap[kv.Key] = col;
+                    }
+                }
+            }
 
             using var tr = AcDb.TransactionManager.StartTransaction();
 
-            // Gather all COGO points in insertion order
             var allPoints = new List<CogoPointData>();
             foreach (ObjectId id in CivilDoc.Points)
             {
@@ -91,25 +110,34 @@ namespace Civil3DMCPPlugin.Tools
                     cp.PointNumber, cp.Easting, cp.Northing, cp.Elevation,
                     cp.RawDescription));
             }
-            // Sort by point number so figure sequences are in survey order
             allPoints.Sort((a, b) => a.No.CompareTo(b.No));
 
-            // Parse .B / .E codes into figure runs
             var figures = ParseFigures(allPoints, filterCodes);
 
-            // Draw
-            EnsureLayer(tr, layer);
+            // Pre-create all required layers
+            EnsureLayer(tr, defaultLayer);
+            foreach (var lay in codeLayerMap.Values.Distinct())
+                EnsureLayer(tr, lay);
+
             ObjectId siteId = ResolveSite(tr, siteName);
             int drawn = 0;
 
-            foreach (var (code, pts) in figures)
+            foreach (var (figKey, pts) in figures)
             {
                 if (pts.Count < 2) continue;
 
+                // Extract base code (strip numeric suffix added by ParseFigures)
+                var baseCode = figKey.Contains('_')
+                    ? figKey[..figKey.LastIndexOf('_')]
+                    : figKey;
+
+                var figLayer = codeLayerMap.TryGetValue(baseCode, out var cl)
+                    ? cl : defaultLayer;
+
                 if (!siteId.IsNull)
-                    DrawFeatureLine(tr, siteId, layer, code, pts);
+                    DrawFeatureLine(tr, siteId, figLayer, baseCode, pts);
                 else
-                    Draw3DPolyline(tr, layer, pts);
+                    Draw3DPolyline(tr, figLayer, pts);
                 drawn++;
             }
 

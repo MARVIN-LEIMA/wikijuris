@@ -15,6 +15,8 @@ namespace Civil3DMCPPlugin
         private readonly PipeTool _pipe = new();
         private readonly RoadTool _road = new();
         private readonly PointImportTool _points = new();
+        private readonly DrawingTool _drawing = new();
+        private readonly BreaklineConflictTool _conflict = new();
 
         public object? Execute(string tool, JObject p) => tool switch
         {
@@ -60,6 +62,15 @@ namespace Civil3DMCPPlugin
             "import_points"              => _points.ImportPoints(p),
             "create_figures"             => _points.CreateFigures(p),
             "create_point_group"         => _points.CreatePointGroup(p),
+
+            // ── Drawing management ────────────────────────────────────────────
+            "new_drawing_from_template"  => _drawing.NewFromTemplate(p),
+            "save_drawing"               => _drawing.SaveDrawing(p),
+            "get_drawing_info"           => _drawing.GetDrawingInfo(p),
+
+            // ── Breakline conflict detection & fix ────────────────────────────
+            "check_breakline_conflicts"  => _conflict.CheckConflicts(p),
+            "fix_breakline_conflicts"    => _conflict.FixConflicts(p),
 
             _ => throw new NotSupportedException($"Unknown tool: '{tool}'")
         };

@@ -1,0 +1,144 @@
+{
+  "version": "1.0",
+  "default_layer": "C-SURV-FTRE",
+  "codes": [
+    {
+      "code": "SFSL",
+      "description": "Surface Level",
+      "layer": "C-SURV-FTRE",
+      "color": 1,
+      "linetype": "Continuous",
+      "include_in_tin": true,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "STFNX",
+      "description": "Stone/Fence (no TIN)",
+      "layer": "C-SURV-FTRE",
+      "color": 3,
+      "linetype": "Continuous",
+      "include_in_tin": false,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "RDCR",
+      "description": "Road Crown",
+      "layer": "C-ROAD-CNTR",
+      "color": 5,
+      "linetype": "Continuous",
+      "include_in_tin": true,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "RDFPX",
+      "description": "Road Formation (existing)",
+      "layer": "C-ROAD-EDGE",
+      "color": 5,
+      "linetype": "Continuous",
+      "include_in_tin": true,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "RDDWX",
+      "description": "Road Drainage/Water",
+      "layer": "C-ROAD-EDGE",
+      "color": 4,
+      "linetype": "Continuous",
+      "include_in_tin": true,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "RDKF",
+      "description": "Road Kerb Face",
+      "layer": "C-ROAD-CURB",
+      "color": 6,
+      "linetype": "Continuous",
+      "include_in_tin": true,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "RDKI",
+      "description": "Road Kerb Inside",
+      "layer": "C-ROAD-CURB",
+      "color": 6,
+      "linetype": "Continuous",
+      "include_in_tin": true,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "RDKL",
+      "description": "Road Kerb Low",
+      "layer": "C-ROAD-CURB",
+      "color": 6,
+      "linetype": "Continuous",
+      "include_in_tin": true,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "DRKO",
+      "description": "Driveway Crossover",
+      "layer": "C-ROAD-DRWY",
+      "color": 2,
+      "linetype": "Continuous",
+      "include_in_tin": false,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "TEGEN",
+      "description": "Top of Edge/Gravel",
+      "layer": "C-SURV-FTRE",
+      "color": 1,
+      "linetype": "Continuous",
+      "include_in_tin": true,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "ELMK",
+      "description": "Electricity Marker",
+      "layer": "C-UTIL-ELEC",
+      "color": 2,
+      "include_in_tin": false,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "WSMK",
+      "description": "Water Service Marker",
+      "layer": "C-UTIL-WATR",
+      "color": 4,
+      "include_in_tin": false,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "WSMT",
+      "description": "Water Service Meter",
+      "layer": "C-UTIL-WATR",
+      "color": 4,
+      "include_in_tin": false,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "COPIT",
+      "description": "Concrete Pit",
+      "layer": "C-UTIL-DRNG",
+      "color": 7,
+      "include_in_tin": false,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "ELBX",
+      "description": "Electricity Box",
+      "layer": "C-UTIL-ELEC",
+      "color": 2,
+      "include_in_tin": false,
+      "draw_as": "3d_polyline"
+    },
+    {
+      "code": "SEIOT",
+      "description": "Service/Other",
+      "layer": "C-UTIL-OTHR",
+      "color": 7,
+      "include_in_tin": false,
+      "draw_as": "3d_polyline"
+    }
+  ]
+}
