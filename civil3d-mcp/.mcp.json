@@ -3,7 +3,7 @@
     "civil3d": {
       "command": "python",
       "args": ["-m", "civil3d_mcp.server"],
-      "cwd": "${workspaceFolder}/civil3d-mcp/python-server/src",
+      "cwd": "C:\\Users\\malei\\Downloads\\civil3d-mcp\\python-server\\src",
       "env": {
         "CIVIL3D_BRIDGE_URL": "http://localhost:3765",
         "CIVIL3D_BRIDGE_TIMEOUT": "30"

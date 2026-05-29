@@ -10,20 +10,40 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <PlatformTarget>x64</PlatformTarget>
+
+    <!--
+      ── DLL search paths ───────────────────────────────────────────────────
+      AutoCadRoot : directory that contains accoremgd.dll / acdbmgd.dll / acmgd.dll
+                    (the AutoCAD installation root, NOT the AEC subfolder)
+      CivilRoot   : directory that contains AeccDbMgd.dll / AeccLandMgd.dll
+                    (defaults to $(AutoCadRoot)\AEC — override if your layout differs)
+
+      Pass on the CLI:
+        dotnet build -p:AutoCadRoot="C:\Program Files\Autodesk\AutoCAD 2026" -c Release
+      or define them in a Directory.Build.props next to this file.
+      ────────────────────────────────────────────────────────────────────────
+    -->
+    <AutoCadRoot Condition="'$(AutoCadRoot)' == ''">C:\Program Files\Autodesk\AutoCAD 2026</AutoCadRoot>
+    <CivilRoot   Condition="'$(CivilRoot)'   == ''">$(AutoCadRoot)\AEC</CivilRoot>
   </PropertyGroup>
 
-  <!-- AutoCAD / Civil 3D assemblies — copy from your Civil 3D install folder -->
+  <!--
+    AutoCAD core DLLs live in the AutoCAD root (NOT the AEC sub-folder).
+    Civil 3D DLLs live in the AEC sub-folder.
+    Private=false → these DLLs are NOT copied to the output; Civil 3D
+    already loads them from its own directory at runtime.
+  -->
   <ItemGroup>
     <Reference Include="accoremgd">
-      <HintPath>$(CivilRoot)\accoremgd.dll</HintPath>
+      <HintPath>$(AutoCadRoot)\accoremgd.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>$(CivilRoot)\acdbmgd.dll</HintPath>
+      <HintPath>$(AutoCadRoot)\acdbmgd.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>$(CivilRoot)\acmgd.dll</HintPath>
+      <HintPath>$(AutoCadRoot)\acmgd.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="AeccDbMgd">
@@ -36,9 +56,48 @@
     </Reference>
   </ItemGroup>
 
-  <!-- NuGet packages -->
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
+
+  <!--
+    Helper target: run  dotnet build -t:FindDlls  to print the resolved DLL
+    paths without compiling — useful for diagnosing "assembly not found" errors.
+  -->
+  <Target Name="FindDlls">
+    <Message Importance="High" Text="AutoCadRoot = $(AutoCadRoot)" />
+    <Message Importance="High" Text="CivilRoot   = $(CivilRoot)" />
+    <Message Importance="High" Text="" />
+    <Message Importance="High"
+      Text="[OK]  $(AutoCadRoot)\accoremgd.dll"
+      Condition="Exists('$(AutoCadRoot)\accoremgd.dll')" />
+    <Message Importance="High"
+      Text="[MISSING]  $(AutoCadRoot)\accoremgd.dll"
+      Condition="!Exists('$(AutoCadRoot)\accoremgd.dll')" />
+    <Message Importance="High"
+      Text="[OK]  $(AutoCadRoot)\acdbmgd.dll"
+      Condition="Exists('$(AutoCadRoot)\acdbmgd.dll')" />
+    <Message Importance="High"
+      Text="[MISSING]  $(AutoCadRoot)\acdbmgd.dll"
+      Condition="!Exists('$(AutoCadRoot)\acdbmgd.dll')" />
+    <Message Importance="High"
+      Text="[OK]  $(AutoCadRoot)\acmgd.dll"
+      Condition="Exists('$(AutoCadRoot)\acmgd.dll')" />
+    <Message Importance="High"
+      Text="[MISSING]  $(AutoCadRoot)\acmgd.dll"
+      Condition="!Exists('$(AutoCadRoot)\acmgd.dll')" />
+    <Message Importance="High"
+      Text="[OK]  $(CivilRoot)\AeccDbMgd.dll"
+      Condition="Exists('$(CivilRoot)\AeccDbMgd.dll')" />
+    <Message Importance="High"
+      Text="[MISSING]  $(CivilRoot)\AeccDbMgd.dll"
+      Condition="!Exists('$(CivilRoot)\AeccDbMgd.dll')" />
+    <Message Importance="High"
+      Text="[OK]  $(CivilRoot)\AeccLandMgd.dll"
+      Condition="Exists('$(CivilRoot)\AeccLandMgd.dll')" />
+    <Message Importance="High"
+      Text="[MISSING]  $(CivilRoot)\AeccLandMgd.dll"
+      Condition="!Exists('$(CivilRoot)\AeccLandMgd.dll')" />
+  </Target>
 
 </Project>

@@ -1,0 +1,30 @@
+<!--
+  Local build settings — edit the two paths below to match your machine.
+  This file is read automatically by MSBuild/dotnet-build; you do NOT need
+  to pass -p: flags on the command line once this file is correct.
+
+  How to find the right paths
+  ──────────────────────────────────────────────────────────────────────────
+  Run in PowerShell:
+
+      # Find accoremgd.dll (AutoCAD root)
+      Get-ChildItem "C:\Program Files\Autodesk" -Recurse -Filter "accoremgd.dll" |
+          Select-Object DirectoryName
+
+      # Find AeccDbMgd.dll (Civil 3D AEC folder)
+      Get-ChildItem "C:\Program Files\Autodesk" -Recurse -Filter "AeccDbMgd.dll" |
+          Select-Object DirectoryName
+
+  Then paste the two directory paths below.
+  ──────────────────────────────────────────────────────────────────────────
+-->
+<Project>
+  <PropertyGroup>
+    <!-- Directory containing: accoremgd.dll  acdbmgd.dll  acmgd.dll -->
+    <AutoCadRoot>C:\Program Files\Autodesk\AutoCAD 2026</AutoCadRoot>
+
+    <!-- Directory containing: AeccDbMgd.dll  AeccLandMgd.dll          -->
+    <!-- Usually $(AutoCadRoot)\AEC — change only if the files are elsewhere -->
+    <CivilRoot>$(AutoCadRoot)\AEC</CivilRoot>
+  </PropertyGroup>
+</Project>
