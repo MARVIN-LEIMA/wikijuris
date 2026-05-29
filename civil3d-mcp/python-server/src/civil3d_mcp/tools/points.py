@@ -12,6 +12,7 @@ from mcp.server import Server
 from mcp.types import TextContent
 from .. import bridge_client as bridge
 from .. import csv_utils
+from .. import surveyor_csv as scsv
 
 
 def register(app: Server) -> None:
@@ -155,3 +156,87 @@ def register(app: Server) -> None:
 
         result = await bridge.call("create_point_group", params)
         return [TextContent(type="text", text=f"Point group: {result}")]
+
+    # ── 5. Surveyor GNSS CSV processor ───────────────────────────────────────
+
+    @app.tool()
+    async def process_surveyor_csv(
+        input_path: str,
+        output_path: str,
+        duplicate_threshold_mm: float = 3.0,
+        input_encoding: str | None = None,
+    ) -> list[TextContent]:
+        """
+        Process a GNSS surveyor CSV file and write a Civil 3D-ready PENZD CSV.
+
+        Expected input format (no header, comma-delimited):
+          Col 0  : Point number (integer; non-numeric chars are stripped)
+          Col 1  : Easting  (local grid, metres)
+          Col 2  : Northing (local grid, metres)
+          Col 3  : Elevation (metres)
+          Col 4  : Feature code (e.g. RDCR, SFSL, STFNX)
+          Col 5+ : Up to 10 optional attributes, then GPS metadata columns
+                   (GPS columns are auto-detected by degree-sign pattern and
+                   are excluded from the output)
+
+        Point-number cleaning:
+          All non-digit characters (including BOM, hyphens, letters) are
+          stripped.  Names that yield no digits at all are skipped with a
+          warning.
+
+        Duplicate handling:
+          • 3-D distance < threshold (default 3 mm) → same physical point
+              – If the older observation has no attributes but the newer
+                does, the newer row is kept (better data).
+              – Otherwise the older (first) observation is kept.
+          • 3-D distance ≥ threshold → both observations are valid;
+              the older keeps its original number and the newer is
+              automatically renumbered to the next available integer.
+
+        Output: PENZD ASCII CSV (PointNo, Easting, Northing, Elevation,
+        Description), no BOM, CRLF line endings, ready for Civil 3D import
+        using import_points_from_csv with format="PENZD".
+
+        Args:
+            input_path:              Full path to the input CSV.
+            output_path:             Full path for the output PENZD CSV.
+            duplicate_threshold_mm:  Duplicate distance threshold in mm
+                                     (default 3.0 mm).
+            input_encoding:          Force encoding (e.g. "utf-8", "gbk").
+                                     Auto-detected from BOM / byte patterns
+                                     when omitted.
+        """
+        result = scsv.process_surveyor_pipeline(
+            input_path=input_path,
+            output_path=output_path,
+            threshold_mm=duplicate_threshold_mm,
+            encoding=input_encoding,
+        )
+
+        lines = [
+            f"Encoding detected     : {result['encoding_detected']}",
+            f"Attribute cols found  : {result['attribute_columns_detected']}",
+            f"Rows input            : {result['rows_input']}",
+            f"Rows output           : {result['rows_output']}",
+            f"Rows discarded        : {result['rows_discarded']}",
+            f"Output                : {result['output_path']}",
+        ]
+
+        if result['parse_warnings']:
+            lines.append("\nParse warnings:")
+            lines.extend(f"  {w}" for w in result['parse_warnings'])
+
+        if result['duplicate_report']:
+            lines.append("\nDuplicate report:")
+            lines.extend(f"  {r}" for r in result['duplicate_report'])
+
+        lines.append("\nCode summary:")
+        for code, cnt in result['code_summary'].items():
+            lines.append(f"  {code:14s}: {cnt}")
+
+        lines.append(
+            f"\nNext step: call import_points_from_csv with "
+            f'csv_path="{result["output_path"]}", format="PENZD"'
+        )
+
+        return [TextContent(type="text", text="\n".join(lines))]

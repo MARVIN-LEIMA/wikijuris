@@ -27,7 +27,7 @@ namespace Civil3DMCPPlugin.Tools
         public object ImportPoints(JObject p)
         {
             var csvPath   = p["csv_path"]!.Value<string>()!;
-            var format    = p["format"]?.Value<string>() ?? "PNEZD";  // PNEZD or PENZD
+            var format    = p["format"]?.Value<string>() ?? "PENZD";  // PENZD (E before N) or PNEZD
             var groupName = p["point_group"]?.Value<string>();
             var addToDwg  = p["add_to_drawing"]?.Value<bool>() ?? true;
 

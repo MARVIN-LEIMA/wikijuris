@@ -145,7 +145,7 @@ def to_pnezd_rows(rows: list[dict]) -> list[list[str]]:
 
 def write_ascii_csv(rows_pnezd: list[list[str]], output_path: str | Path) -> None:
     """Write to ASCII (latin-1) CSV, no BOM, CRLF line endings (Civil 3D default)."""
-    with open(output_path, "w", newline="\r\n", encoding="ascii",
+    with open(output_path, "w", newline="", encoding="ascii",
               errors="replace") as f:
         writer = csv.writer(f)
         for row in rows_pnezd:
