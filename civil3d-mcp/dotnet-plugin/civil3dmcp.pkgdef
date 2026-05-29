@@ -1,0 +1,5 @@
+[$RootKey$\Applications\{00000000-0000-0000-0000-000000000001}\Profiles\<<Default>>\Applications\{E706E4B0-0F5C-4A3E-B04C-B3B8A6A3A8D0}]
+"DESCRIPTION"="Civil 3D MCP Plugin"
+"LOADCTRLS"=dword:00000014
+"LOADER"="Civil3DMCPPlugin.dll"
+"MANAGED"=dword:00000001
